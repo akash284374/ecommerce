@@ -195,7 +195,6 @@ export const register = async (req, res) => {
       .cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .status(201)
@@ -240,7 +239,6 @@ export const login = async (req, res) => {
       .cookie("token", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
       .status(200)
@@ -264,7 +262,6 @@ export const logout = (req, res) => {
   res
     .clearCookie("token", {
       httpOnly: true,
-      sameSite: "Lax", // or "None" if you're using cross-site cookies
       secure: false,   // true if using HTTPS in production
     })
     .status(200)
