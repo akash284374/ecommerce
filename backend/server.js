@@ -17,7 +17,10 @@ const app = express();
 // ✅ Connect to MongoDB
 connectDB();
 
-const frontend_origin = (process.env.CORS_ORIGIN || "https://flexkicks.vercel.app").split(",")
+// const frontend_origin = (process.env.CORS_ORIGIN || "https://flexkicks.vercel.app").split(",")
+const frontend_origin = (process.env.CORS_ORIGIN || "https://flexkicks.vercel.app")
+  .split(",")
+  .map(origin => origin.trim()); // ✅ TRIM spaces
 
 // ✅ Middleware
 app.use(cors({
