@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { axiosInstance } from "../services/authService";
 
 const AdminOrders = () => {
   const { user } = useAuth();
@@ -9,11 +9,8 @@ const AdminOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/orders/admin`,
-        { withCredentials: true }
-      );
-      setOrders(res.data.orders);
+      const res = await axiosInstance(); // consider axiosInstance.get("/admin/orders")
+      setOrders(res?.data?.orders || []);
     } catch (err) {
       console.error("Failed to fetch admin orders:", err);
       setError(err.response?.data?.message || "Something went wrong");
@@ -34,7 +31,7 @@ const AdminOrders = () => {
 
       {error && <p className="text-red-500 mb-4">{error}</p>}
 
-      {orders.length === 0 ? (
+      {orders?.length === 0 ? (
         <p className="text-gray-700 dark:text-gray-300">No orders found</p>
       ) : (
         <div className="space-y-6">

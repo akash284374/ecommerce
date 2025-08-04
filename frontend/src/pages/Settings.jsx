@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import axios from "axios";
+import { passwordChange, profileUpdate } from "../services/productService";
 
 const Settings = () => {
   const { user, refreshUser } = useAuth();
@@ -31,14 +32,7 @@ const Settings = () => {
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(
-        "http://localhost:5000/api/auth/update-profile",
-        {
-          name: formData.name,
-          username: formData.username,
-        },
-        { withCredentials: true }
-      );
+      await profileUpdate();
       alert("✅ Profile updated!");
       refreshUser();
     } catch (err) {
@@ -49,14 +43,7 @@ const Settings = () => {
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(
-        "http://localhost:5000/api/auth/change-password",
-        {
-          oldPassword: formData.oldPassword,
-          newPassword: formData.newPassword,
-        },
-        { withCredentials: true }
-      );
+      await passwordChange();
       alert("✅ Password changed!");
     } catch (err) {
       alert(err.response?.data?.message || "Password change failed");

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { getPaymentHistory, paymentHandle, paymentSave, userOrders } from "../services/productService";
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -26,9 +27,7 @@ const Payment = () => {
 
   const fetchPaymentHistory = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/payment/history", {
-        withCredentials: true,
-      });
+      const { data } = await getPaymentHistory();
       setHistory(data.payments || []);
     } catch (err) {
       console.error("Failed to fetch payment history", err);
@@ -46,11 +45,7 @@ const Payment = () => {
     setStatus("initiating");
 
     try {
-      const { data } = await axios.post(
-        "http://localhost:5000/api/payment/create-order",
-        { amount: price * 100 },
-        { withCredentials: true }
-      );
+      const { data } = await paymentHandle();
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -69,21 +64,8 @@ const Payment = () => {
           };
 
           try {
-            await axios.post("http://localhost:5000/api/payment/save", details, {
-              withCredentials: true,
-            });
-
-            await axios.post(
-              "http://localhost:5000/api/orders",
-              {
-                paymentId: details.paymentId,
-                productId: details.productId,
-                amount: details.amount,
-              },
-              {
-                withCredentials: true,
-              }
-            );
+            await paymentSave();
+            await userOrders();
 
             setPaymentDetails(details);
             setStatus("success");

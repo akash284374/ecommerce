@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 import User from "../models/userModel.js";
 
 export const protect = async (req, res, next) => {
-    const token = req.cookies.token; // ✅ correct
+    const token = req.headers.authorization || req.cookies.token; // ✅ correct
     // const token = req.cookies.token || req.cookies["authjs.session-token"];
-    console.log("🧪 Incoming cookies:", req.cookies);
+    console.log("🧪 Incoming cookies:", req.headers.authorization || req.cookies.token);
 
     if (!token) return res.status(401).json({ message: "Unauthorized" });
 

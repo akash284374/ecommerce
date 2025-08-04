@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useLocation } from "react-router-dom";
 import ProductCard from "../components/ProductCard";
-
-const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+import { getProducts } from "../services/productService";
+import toast from "react-hot-toast";
 
 const Home = () => {
   const [products, setProducts] = useState([]);
@@ -11,23 +10,30 @@ const Home = () => {
 
   const location = useLocation();
 
-  // Get ?search= value from URL
+  // Extract ?search= value from URL
   const query = new URLSearchParams(location.search);
   const search = query.get("search")?.toLowerCase() || "";
 
+  // ✅ Fetch all products on mount
   useEffect(() => {
-    axios
-      .get(`${API}/api/products`)
-      .then((res) => {
-        setProducts(res.data.products);
-      })
-      .catch((err) => console.error("Error fetching products:", err));
+    const fetchProducts = async () => {
+      try {
+        const { data } = await getProducts();
+        setProducts(data?.products || []);
+      } catch (err) {
+        console.error("Product fetch error:", err);
+        toast.error("Error while fetching products");
+      }
+    };
+
+    fetchProducts();
   }, []);
 
+  // ✅ Filter products when `search` or `products` change
   useEffect(() => {
     if (search.trim()) {
       const filtered = products.filter((product) =>
-        product.name.toLowerCase().includes(search)
+        product?.name?.toLowerCase().includes(search)
       );
       setFilteredProducts(filtered);
     } else {
@@ -41,7 +47,7 @@ const Home = () => {
         All Products
       </h1>
 
-      {filteredProducts.length === 0 ? (
+      {filteredProducts?.length === 0 ? (
         <p className="text-gray-700 dark:text-gray-300">No products found.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">

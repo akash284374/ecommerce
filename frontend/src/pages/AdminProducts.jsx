@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext"; // ✅ Import auth context
+import { adminDeleteProduct, getAdminProduct } from "../services/userService";
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -13,10 +14,7 @@ const AdminProducts = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/products/admin`,
-        { withCredentials: true }
-      );
+      const res = await  getAdminProduct();
       setProducts(res.data.products);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to fetch products");
@@ -25,10 +23,7 @@ const AdminProducts = () => {
 
   const handleDelete = async (productId) => {
     try {
-      await axios.delete(
-        `${import.meta.env.VITE_BACKEND_URL}/api/products/admin/${productId}`,
-        { withCredentials: true }
-      );
+      await adminDeleteProduct(productId);
       fetchProducts();
     } catch (err) {
       console.error("❌ Delete failed:", err);

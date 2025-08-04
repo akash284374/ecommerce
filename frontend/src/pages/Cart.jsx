@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { decreseQuantityFromCart, getCart, removeProductFromCart } from "../services/userService";
+// import { removeProductFromCart } from "../services/userService";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -10,9 +12,7 @@ const Cart = () => {
 
   const fetchCart = async () => {
     try {
-      const { data } = await axios.get("http://localhost:5000/api/user/cart", {
-        withCredentials: true,
-      });
+      const { data } = await getCart();
       setCartItems(data.cart);
     } catch (error) {
       toast.error("Failed to fetch cart items.");
@@ -28,11 +28,7 @@ const Cart = () => {
 
   const handleDecrease = async (productId) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/user/cart/decrease/${productId}`,
-        {},
-        { withCredentials: true }
-      );
+      await decreseQuantityFromCart(productId);
       toast.success("Quantity decreased");
       fetchCart();
     } catch (err) {
@@ -42,9 +38,7 @@ const Cart = () => {
 
   const handleRemove = async (productId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/user/cart/${productId}`, {
-        withCredentials: true,
-      });
+      await removeProductFromCart(productId);
       toast.success("Item removed");
       fetchCart();
     } catch (err) {

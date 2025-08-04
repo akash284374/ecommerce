@@ -158,23 +158,18 @@ export const register = async (req, res) => {
   try {
     const { name, username, email, password, otp } = req.body;
 
-    console.log("🔥 Incoming register data:", { name, username, email, password, otp });
-
     if (!name || !username || !email || !password || !otp) {
-      console.log("❌ Missing fields");
       return res.status(400).json({ message: "All fields are required" });
     }
 
     const user = await User.findOne({ email });
 
     if (!user || user.otp !== otp || user.otpExpiry < Date.now()) {
-      console.log("❌ OTP invalid or expired");
       return res.status(400).json({ message: "Invalid or expired OTP" });
     }
 
     // Prevent re-registering
     if (user.password && user.name && user.username) {
-      console.log("❌ User already registered");
       return res.status(400).json({ message: "User already registered" });
     }
 
@@ -192,11 +187,6 @@ export const register = async (req, res) => {
     const token = createToken(user._id);
 
     res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
       .status(201)
       .json({
         message: "Registered successfully",
@@ -207,6 +197,7 @@ export const register = async (req, res) => {
           email: user.email,
           role: user.role,
         },
+        token
       });
   } catch (error) {
     console.error("❌ Server error:", error.message);
@@ -236,11 +227,6 @@ export const login = async (req, res) => {
     const token = createToken(user._id);
 
     res
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
       .status(200)
       .json({
         message: "Login successful",
@@ -251,6 +237,7 @@ export const login = async (req, res) => {
           email: user.email,
           role: user.role,
         },
+        token
       });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
@@ -260,12 +247,8 @@ export const login = async (req, res) => {
 // Logout
 export const logout = (req, res) => {
   res
-    .clearCookie("token", {
-      httpOnly: true,
-      secure: false,   // true if using HTTPS in production
-    })
     .status(200)
-    .json({ message: "Logged out successfully" });
+    .json({ message: "Logged out successfully", token: null });
 };
 
 

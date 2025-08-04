@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { addToCart } from "../services/userService";
 
 const ProductCard = ({ product }) => {
   const { user, loading } = useAuth();
@@ -10,11 +11,7 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = async () => {
     try {
-      await axios.post(
-        "http://localhost:5000/api/user/cart",
-        { productId: product._id },
-        { withCredentials: true }
-      );
+      await addToCart(product._id)
       toast.success("✅ Added to cart");
     } catch (err) {
       console.error("Add to cart error:", err);

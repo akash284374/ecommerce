@@ -1,6 +1,7 @@
 // src/pages/AddProduct.jsx
 import React, { useState } from "react";
 import axios from "axios";
+import { productAddMessage } from "../services/userService";
 
 const AddProduct = () => {
   const [formData, setFormData] = useState({
@@ -40,16 +41,7 @@ const AddProduct = () => {
     payload.append("image", formData.image);
 
     try {
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/products/add`,
-        payload,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const res = await  productAddMessage(payload)
 
       setMessage(res.data.message || "Product added successfully!");
       setFormData({

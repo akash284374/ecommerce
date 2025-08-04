@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { getUserOrders } from "../services/productService";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -7,9 +8,7 @@ const Orders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/orders/user", {
-          withCredentials: true,
-        });
+        const res = await getUserOrders();
         setOrders(res.data);
       } catch (error) {
         console.error("Failed to fetch orders:", error);

@@ -3,10 +3,30 @@ import axios from "axios";
 const API = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 // Axios instance (optional: easier to maintain headers)
-const axiosInstance = axios.create({
+export const axiosInstance = axios.create({
   baseURL: API,
   withCredentials: true,
 });
+
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token")
+    if (token) {
+      config.headers.Authorization = token;
+    }
+
+    return config
+  }
+)
+
+axiosInstance.interceptors.response.use(
+  (config) => {
+    if (config.data.token) {
+      localStorage.setItem("token", config.data.token)
+    }
+    return config
+  }
+)
 
 // Send OTP
 export const sendOtp = (email) => {
