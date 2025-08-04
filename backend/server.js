@@ -21,15 +21,16 @@ const frontend_origin = process.env.CORS_ORIGIN.split(",") ?? ["*"]
 
 // ✅ Middleware
 app.use(cors({
-  origin: function (origin, callback) {
-      if (!origin) return callback(null, true);
+  // origin: function (origin, callback) {
+  //     if (!origin) return callback(null, true);
 
-      if (frontend_origin.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("Not allowed by CORS"));
-      }
-    },
+  //     if (frontend_origin.includes(origin)) {
+  //       return callback(null, true);
+  //     } else {
+  //       return callback(new Error("Not allowed by CORS"));
+  //     }
+  //   }
+  origin: "*",
     credentials: true,
   })
 );
