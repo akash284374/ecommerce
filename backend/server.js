@@ -17,11 +17,22 @@ const app = express();
 // ✅ Connect to MongoDB
 connectDB();
 
+const frontend_origin = process.env.CORS_ORIGIN.split(",") ?? ["*"]
+
 // ✅ Middleware
 app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true,
-}));
+  origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (frontend_origin.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
