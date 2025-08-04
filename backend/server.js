@@ -17,20 +17,19 @@ const app = express();
 // ✅ Connect to MongoDB
 connectDB();
 
-const frontend_origin = process.env.CORS_ORIGIN.split(",") ?? ["*"]
+const frontend_origin = (process.env.CORS_ORIGIN || "https://flexkicks.vercel.app").split(",")
 
 // ✅ Middleware
 app.use(cors({
-  // origin: function (origin, callback) {
-  //     if (!origin) return callback(null, true);
+  origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
 
-  //     if (frontend_origin.includes(origin)) {
-  //       return callback(null, true);
-  //     } else {
-  //       return callback(new Error("Not allowed by CORS"));
-  //     }
-  //   }
-  origin: "*",
+      if (frontend_origin.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
