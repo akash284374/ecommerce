@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { axiosInstance } from "../services/authService";
+import { getAdminOrders } from "../services/productService";
 
 const AdminOrders = () => {
   const { user } = useAuth();
@@ -9,7 +10,7 @@ const AdminOrders = () => {
 
   const fetchOrders = async () => {
     try {
-      const res = await axiosInstance(); // consider axiosInstance.get("/admin/orders")
+      const res = await getAdminOrders(); // consider axiosInstance.get("/admin/orders")
       setOrders(res?.data?.orders || []);
     } catch (err) {
       console.error("Failed to fetch admin orders:", err);
