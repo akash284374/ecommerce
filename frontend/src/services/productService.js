@@ -25,8 +25,8 @@ export const profileUpdate=async()=>{
     return axiosInstance.put(`/api/auth/update-profile`)
 }
 
-export const passwordChange=async()=>{
-    return axiosInstance.put(`/api/auth/change-password`)
+export const passwordChange=async(payload)=>{
+    return axiosInstance.put(`/api/auth/change-password`,payload)
 }
 
 export const paymentSave=()=>{

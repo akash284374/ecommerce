@@ -1,8 +1,7 @@
-// src/pages/Settings.jsx
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
-import axios from "axios";
 import { passwordChange, profileUpdate } from "../services/productService";
+import toast from "react-hot-toast";
 
 const Settings = () => {
   const { user, refreshUser } = useAuth();
@@ -32,21 +31,38 @@ const Settings = () => {
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
     try {
-      await profileUpdate();
-      alert("✅ Profile updated!");
+      await profileUpdate({
+        name: formData.name,
+        username: formData.username,
+      });
+      toast.success("✅ Profile updated!");
       refreshUser();
     } catch (err) {
-      alert(err.response?.data?.message || "Profile update failed");
+      toast.error(err.response?.data?.message || "Profile update failed");
     }
   };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
+
+    const { oldPassword, newPassword } = formData;
+
+    if (!oldPassword || !newPassword) {
+      return toast.error("Please fill both password fields");
+    }
+
     try {
-      await passwordChange();
-      alert("✅ Password changed!");
+      await passwordChange({ oldPassword, newPassword });
+      toast.success("✅ Password changed!");
+
+      // Clear password fields only
+      setFormData((prev) => ({
+        ...prev,
+        oldPassword: "",
+        newPassword: "",
+      }));
     } catch (err) {
-      alert(err.response?.data?.message || "Password change failed");
+      toast.error(err.response?.data?.message || "Password change failed");
     }
   };
 
