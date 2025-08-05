@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getPaymentHistory, paymentHandle, paymentSave, userOrders } from "../services/productService";
 
@@ -30,7 +29,7 @@ const Payment = () => {
       const { data } = await getPaymentHistory();
       setHistory(data.payments || []);
     } catch (err) {
-      console.error("Failed to fetch payment history", err);
+      console.error("❌ Failed to fetch payment history", err);
     }
   };
 
@@ -45,7 +44,7 @@ const Payment = () => {
     setStatus("initiating");
 
     try {
-      const { data } = await paymentHandle();
+      const { data } = await paymentHandle(price * 100); // price in paise
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -63,9 +62,19 @@ const Payment = () => {
             currency: data.order.currency,
           };
 
+          console.log("📤 Sending Payment Details:", details); // Debug
+
           try {
-            await paymentSave();
-            await userOrders();
+            const res = await paymentSave(details);
+            console.log("✅ Payment saved to backend:", res.data);
+
+            // await userOrders();
+            await userOrders({
+  paymentId: response.razorpay_payment_id,
+  productId,
+  amount: data.order.amount / 100, // or use raw `price` if needed
+});
+
 
             setPaymentDetails(details);
             setStatus("success");
@@ -75,7 +84,7 @@ const Payment = () => {
               navigate("/orders");
             }, 2000);
           } catch (err) {
-            console.error("❌ Failed to save order/payment", err);
+            console.error("❌ Failed to save order/payment:", err);
             setError("Failed to save order or payment.");
             setStatus("failed");
           }
@@ -102,7 +111,14 @@ const Payment = () => {
 
   useEffect(() => {
     fetchPaymentHistory();
-    if (price && productId) handlePayment();
+
+    if (!price || !productId) {
+      setError("Invalid product or price information.");
+      setStatus("failed");
+      return;
+    }
+
+    handlePayment();
   }, []);
 
   return (

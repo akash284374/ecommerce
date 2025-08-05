@@ -17,8 +17,8 @@ export const getPaymentHistory=async()=>{
     return axiosInstance.get(`/api/payment/history`)
 }
 
-export const paymentHandle=async()=>{
-    return axiosInstance.get(`/api/payment/create-order`)
+export const paymentHandle=async(amount)=>{
+    return axiosInstance.post(`/api/payment/create-order`,{amount})
 }
 
 export const profileUpdate=async()=>{
@@ -29,10 +29,10 @@ export const passwordChange=async(payload)=>{
     return axiosInstance.put(`/api/auth/change-password`,payload)
 }
 
-export const paymentSave=()=>{
-    return axiosInstance.post(`/api/payment/save`)
+export const paymentSave=(details)=>{
+    return axiosInstance.post(`/api/payment/save`,details)
 }
 
-export const userOrders=()=>{
-    return axiosInstance.post(`/api/orders`)
+export const userOrders=(details)=>{
+    return axiosInstance.post(`/api/orders`,details)
 }
