@@ -8,16 +8,14 @@ export const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token")
-    if (token) {
-      config.headers.Authorization = token;
-    }
-
-    return config
+axiosInstance.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`; // <-- Add Bearer prefix here
   }
-)
+  return config;
+});
+
 
 axiosInstance.interceptors.response.use(
   (config) => {
@@ -59,9 +57,16 @@ export const verifyOtp = (data) => {
 };
 
 // Update Profile
+// export const updateProfile = (data) => {
+//   return axiosInstance.put("/api/auth/update-profile", data);
+// };
+
 export const updateProfile = (data) => {
-  return axiosInstance.put("/api/auth/update-profile", data);
+  return axiosInstance.put("/api/auth/update-profile", data, {
+    headers: { "Content-Type": "application/json" },
+  });
 };
+
 
 // Change Password
 export const changePassword = (data) => {

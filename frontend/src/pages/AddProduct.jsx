@@ -1,6 +1,4 @@
-// src/pages/AddProduct.jsx
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useRef } from "react";
 import { productAddMessage } from "../services/userService";
 
 const AddProduct = () => {
@@ -13,6 +11,8 @@ const AddProduct = () => {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [newProduct, setNewProduct] = useState(null); // Store the uploaded product
+  const fileInputRef = useRef(null); // To reset file input manually
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,6 +33,7 @@ const AddProduct = () => {
     e.preventDefault();
     setError("");
     setMessage("");
+    setNewProduct(null);
 
     const payload = new FormData();
     payload.append("name", formData.name);
@@ -41,16 +42,27 @@ const AddProduct = () => {
     payload.append("image", formData.image);
 
     try {
-      const res = await  productAddMessage(payload)
+      const res = await productAddMessage(payload);
+
+      console.log("Backend response product:", res.data.product); // Debug backend product response
 
       setMessage(res.data.message || "Product added successfully!");
+      setNewProduct(res.data.product);
+
+      // Reset form fields
       setFormData({
         name: "",
         description: "",
         price: "",
         image: null,
       });
+
+      // Clear file input manually
+      if (fileInputRef.current) {
+        fileInputRef.current.value = null;
+      }
     } catch (err) {
+      console.error("Add product error:", err);
       setError(err.response?.data?.message || "Failed to add product");
     }
   };
@@ -98,6 +110,7 @@ const AddProduct = () => {
             accept="image/*"
             onChange={handleFileChange}
             className="w-full"
+            ref={fileInputRef}
             required
           />
 
@@ -108,6 +121,23 @@ const AddProduct = () => {
             Add Product
           </button>
         </form>
+
+        {/* Preview newly uploaded product */}
+        {newProduct && (
+          <div className="mt-6 text-center border-t pt-4">
+            <h3 className="text-lg font-semibold mb-2">Preview:</h3>
+            <img
+              src={newProduct.image}
+              alt={newProduct.name}
+              className="mx-auto border rounded w-64 h-64 object-cover"
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/256?text=No+Image";
+              }}
+            />
+            <p className="mt-2 font-semibold">{newProduct.name} - ₹{newProduct.price}</p>
+            <p className="text-gray-500">{newProduct.description}</p>
+          </div>
+        )}
       </div>
     </div>
   );

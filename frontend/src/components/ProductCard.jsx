@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -11,7 +10,7 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = async () => {
     try {
-      await addToCart(product._id)
+      await addToCart(product._id);
       toast.success("✅ Added to cart");
     } catch (err) {
       console.error("Add to cart error:", err);
@@ -23,27 +22,31 @@ const ProductCard = ({ product }) => {
     navigate(`/payment?price=${product.price}&productId=${product._id}`);
   };
 
-  // ✅ Image fallback logic
-  const imageUrl = product.image
-    ? `http://localhost:5000/uploads/${product.image}`
-    : "/no-image.png"; // fallback image (must exist in /public)
+  // ✅ Image handling with cache-busting
+  const fallbackImage = "https://via.placeholder.com/300x200?text=No+Image";
+  const imageUrl =
+    product.image && product.image.startsWith("http")
+      ? `${product.image}?t=${Date.now()}`
+      : fallbackImage;
+
+  // Console log for debugging the image URL
+  console.log("Rendering product image URL:", imageUrl);
 
   return (
     <div className="w-full max-w-xs bg-white dark:bg-gray-900 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700">
-      {/* 🌟 Image wrapper */}
+      {/* Image Section */}
       <div className="w-full aspect-[3/2] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 rounded-t-2xl overflow-hidden flex items-center justify-center p-3">
         <img
           src={imageUrl}
-          alt={product.name}
+          alt={product.name || "Product"}
           className="max-h-full max-w-full object-contain drop-shadow"
+          onError={(e) => (e.target.src = fallbackImage)}
         />
       </div>
 
-      {/* ✅ Optional: Show image name for debugging */}
-      <div className="px-4 pt-1">
-        <p className="text-xs text-red-500">{product.image}</p>
-      </div>
+      {/* Debug URL (hidden in production) */}
 
+      {/* Product Info */}
       <div className="p-4">
         <h3 className="text-md font-semibold text-gray-800 dark:text-gray-100 truncate">
           {product.name}
@@ -55,6 +58,7 @@ const ProductCard = ({ product }) => {
           ₹{product.price}
         </p>
 
+        {/* Actions */}
         {!loading ? (
           user ? (
             <div className="mt-3 flex gap-2">
