@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { passwordChange, profileUpdate } from "../services/productService";
+import { axiosInstance } from "../services/authService"; // axios instance for API calls
 import toast from "react-hot-toast";
 
 const Settings = () => {
-  const { user, refreshUser } = useAuth();
+  // const { user, refreshUser, logout } = useAuth();
+  const { user, refreshUser, logoutUser } = useAuth();
+
 
   const [formData, setFormData] = useState({
     name: "",
@@ -55,7 +58,6 @@ const Settings = () => {
       await passwordChange({ oldPassword, newPassword });
       toast.success("✅ Password changed!");
 
-      // Clear password fields only
       setFormData((prev) => ({
         ...prev,
         oldPassword: "",
@@ -63,6 +65,30 @@ const Settings = () => {
       }));
     } catch (err) {
       toast.error(err.response?.data?.message || "Password change failed");
+    }
+  };
+
+  // Delete account handler with separate try/catch blocks
+  const handleDeleteAccount = async () => {
+    if (
+      window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone."
+      )
+    ) {
+      try {
+        await axiosInstance.delete("/api/auth/delete-account");
+        toast.success("Account deleted successfully");
+      } catch (err) {
+        return toast.error(err.response?.data?.message || "Failed to delete account");
+      }
+
+      try {
+        // await logout();
+        await logoutUser();
+        window.location.href = "/";
+      } catch (err) {
+        toast.error("Logout failed after deleting account");
+      }
     }
   };
 
@@ -127,6 +153,19 @@ const Settings = () => {
               Change Password
             </button>
           </form>
+        </div>
+
+        {/* Delete Account */}
+        <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+          <h2 className="text-2xl font-bold mb-6 text-red-600 dark:text-red-400 flex items-center gap-2">
+            <span>🗑️</span> Delete Account
+          </h2>
+          <button
+            onClick={handleDeleteAccount}
+            className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded shadow"
+          >
+            Delete My Account
+          </button>
         </div>
       </div>
     </div>
