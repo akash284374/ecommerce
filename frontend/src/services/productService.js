@@ -21,9 +21,14 @@ export const paymentHandle=async(amount)=>{
     return axiosInstance.post(`/api/payment/create-order`,{amount})
 }
 
-export const profileUpdate=async()=>{
-    return axiosInstance.put(`/api/auth/update-profile`)
-}
+// export const profileUpdate=async()=>{
+//     return axiosInstance.put(`/api/auth/update-profile`)
+// }
+
+export const profileUpdate = async (payload) => {
+  return axiosInstance.put(`/api/auth/update-profile`, payload);
+};
+
 
 export const passwordChange=async(payload)=>{
     return axiosInstance.put(`/api/auth/change-password`,payload)
