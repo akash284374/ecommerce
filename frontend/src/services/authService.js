@@ -16,40 +16,63 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
+
 axiosInstance.interceptors.response.use(
-  (response) => {
-    if (response.data.token) {
-      localStorage.setItem("token", response.data.token);
+  (config) => {
+    if (config.data.token) {
+      localStorage.setItem("token", config.data.token)
     }
-    return response;
+    return config
   }
-);
+)
 
-// Auth APIs
-
+// Send OTP
 export const sendOtp = (email) => {
   return axiosInstance.post("/api/auth/send-otp", { email });
 };
 
+// Register with OTP
 export const register = (data) => {
   return axiosInstance.post("/api/auth/register", data);
 };
 
+// Login
 export const login = (data) => {
   return axiosInstance.post("/api/auth/login", data);
 };
 
-export const logout = () => {
-  return axiosInstance.get("/api/auth/logout");
+// Logout
+// export const logout = () => {
+//   return axiosInstance.get("/api/auth/logout");
+// };
+
+
+// Logout
+export const logout = async () => {
+  try {
+    await axiosInstance.get("/api/auth/logout");
+  } catch (error) {
+    console.error("Error during logout:", error);
+  } finally {
+    localStorage.removeItem("token"); // Clear token locally
+  }
 };
 
+
+// Get Current User
 export const getCurrentUser = () => {
   return axiosInstance.get("/api/auth/me");
 };
 
+// Verify OTP
 export const verifyOtp = (data) => {
   return axiosInstance.post("/api/auth/verify-otp", data);
 };
+
+// Update Profile
+// export const updateProfile = (data) => {
+//   return axiosInstance.put("/api/auth/update-profile", data);
+// };
 
 export const updateProfile = (data) => {
   return axiosInstance.put("/api/auth/update-profile", data, {
@@ -57,44 +80,28 @@ export const updateProfile = (data) => {
   });
 };
 
+
+// Change Password
 export const changePassword = (data) => {
   return axiosInstance.put("/api/auth/change-password", data);
 };
 
-// Other APIs
 
-export const getProducts = async () => {
-  return axiosInstance.get("/api/products");
+// Send Forgot Password OTP
+export const sendForgotPasswordOtp = (email) => {
+  return axiosInstance.post("/api/auth/forgot-password/send-otp", { email });
 };
 
-export const getAdminOrders = async () => {
-  return axiosInstance.get("/api/orders/admin");
+// Verify Forgot Password OTP
+export const verifyForgotPasswordOtp = (data) => {
+  return axiosInstance.post("/api/auth/forgot-password/verify-otp", data);
+  // data = { email, otp }
 };
 
-export const getUserOrders = async () => {
-  return axiosInstance.get("/api/orders/user");
+// Reset Password
+export const resetPassword = (data) => {
+  return axiosInstance.put("/api/auth/forgot-password/reset", data);
+  // data = { email, newPassword, confirmPassword }
 };
 
-export const getPaymentHistory = async () => {
-  return axiosInstance.get("/api/payment/history");
-};
 
-export const paymentHandle = async (amount) => {
-  return axiosInstance.post("/api/payment/create-order", { amount });
-};
-
-export const profileUpdate = async (payload) => {
-  return axiosInstance.put("/api/auth/update-profile", payload);
-};
-
-export const passwordChange = async (payload) => {
-  return axiosInstance.put("/api/auth/change-password", payload);
-};
-
-export const paymentSave = (details) => {
-  return axiosInstance.post("/api/payment/save", details);
-};
-
-export const userOrders = (details) => {
-  return axiosInstance.post("/api/orders", details);
-};
